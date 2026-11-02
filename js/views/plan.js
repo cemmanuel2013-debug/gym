@@ -42,7 +42,7 @@ export function planEdit(root, id) {
       <div class="plan-list">
         ${w.exercises.map((it, i) => `<div class="card plan-item">
           ${thumb(getEx(it.exId))}
-          <button class="plan-main" data-edit="${i}"><b>${esc(it.name)}</b><small>${targetText(it)} · Pause ${it.rest || 0} s</small></button>
+          <button class="plan-main" data-edit="${i}"><b>${esc(it.name)}</b><small>${targetText(it)}${it.restOn !== false && it.rest ? ` · Pause ${it.rest} s` : ' · ohne Pausentimer'}${it.timer ?? it.type === 'time' ? ' · Timer' : ''}</small></button>
           <span class="plan-move">
             <button class="icon-btn sm" data-up="${i}" aria-label="Nach oben" ${i === 0 ? 'disabled' : ''}>${ICON.up}</button>
             <button class="icon-btn sm" data-down="${i}" aria-label="Nach unten" ${i === w.exercises.length - 1 ? 'disabled' : ''}>${ICON.down}</button>
@@ -105,18 +105,30 @@ function editItem(w, i, rerender) {
      <div class="grid2">
        <label class="field"><span>Sätze</span><input class="input" name="sets" inputmode="numeric" value="${it.sets}"></label>
        <label class="field" data-show="reps"><span>Wiederholungen</span><input class="input" name="reps" value="${esc(it.reps)}" placeholder="z. B. 8-12"></label>
-       <label class="field" data-show="time"><span>Sekunden</span><input class="input" name="seconds" inputmode="numeric" value="${it.seconds || ''}"></label>
-       <label class="field"><span>Pause (Sek.)</span><input class="input" name="rest" inputmode="numeric" value="${it.rest ?? 90}"></label>
+       <label class="field" data-show="time"><span>Sekunden (Timer)</span><input class="input" name="seconds" inputmode="numeric" value="${it.seconds || ''}" placeholder="45"></label>
+       <label class="field" data-show="rest"><span>Pause (Sek.)</span><input class="input" name="rest" inputmode="numeric" value="${it.rest || 90}"></label>
+     </div>
+     <div class="toggles card">
+       <label class="switch"><input type="checkbox" name="timer" ${it.timer ?? it.type === 'time' ? 'checked' : ''}><span></span>Timer bei dieser Übung</label>
+       <label class="switch"><input type="checkbox" name="restOn" ${it.restOn !== false && it.rest !== 0 ? 'checked' : ''}><span></span>Pausentimer nach jedem Satz</label>
      </div>
      <button class="btn primary full" data-save>Übernehmen</button>
      <button class="btn danger-ghost full" data-remove>Aus Workout entfernen</button>`,
     (sheet, close) => {
+      const timerBox = sheet.querySelector('[name="timer"]');
+      const restBox = sheet.querySelector('[name="restOn"]');
       const sync = () => {
         const type = sheet.querySelector('[name="type"]:checked').value;
         sheet.querySelector('[data-show="reps"]').hidden = type !== 'reps';
-        sheet.querySelector('[data-show="time"]').hidden = type !== 'time';
+        sheet.querySelector('[data-show="time"]').hidden = type !== 'time' && !timerBox.checked;
+        sheet.querySelector('[data-show="rest"]').hidden = !restBox.checked;
       };
-      sheet.querySelectorAll('[name="type"]').forEach((r) => r.addEventListener('change', sync));
+      sheet.querySelectorAll('[name="type"]').forEach((r) => r.addEventListener('change', () => {
+        if (r.checked && r.value === 'time') timerBox.checked = true;
+        sync();
+      }));
+      timerBox.addEventListener('change', sync);
+      restBox.addEventListener('change', sync);
       sync();
       sheet.querySelector('[data-save]').addEventListener('click', () => {
         const v = (n) => sheet.querySelector(`[name="${n}"]`).value.trim();
@@ -124,8 +136,10 @@ function editItem(w, i, rerender) {
         it.type = sheet.querySelector('[name="type"]:checked').value;
         it.sets = Math.max(1, Math.min(20, parseInt(v('sets'), 10) || 3));
         it.reps = v('reps');
-        it.seconds = Math.max(0, parseInt(v('seconds'), 10) || 0) || (it.type === 'time' ? 45 : 0);
-        it.rest = Math.max(0, parseInt(v('rest'), 10) || 0);
+        it.timer = timerBox.checked;
+        it.restOn = restBox.checked;
+        it.seconds = Math.max(0, parseInt(v('seconds'), 10) || 0) || (it.type === 'time' || it.timer ? 45 : 0);
+        it.rest = Math.max(0, parseInt(v('rest'), 10) || 0) || 90;
         saveNow(); close(); rerender();
       });
       sheet.querySelector('[data-remove]').addEventListener('click', () => {

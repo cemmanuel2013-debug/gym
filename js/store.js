@@ -122,6 +122,7 @@ export function makeEntry(item) {
   return {
     id: uid(), itemId: item.id, exId: item.exId, name: item.name, type: item.type,
     reps: item.reps, seconds: item.seconds, rest: item.rest, targetSets: n,
+    timer: item.timer ?? item.type === 'time', restOn: item.restOn !== false,
     sets, note: '', video: null,
   };
 }

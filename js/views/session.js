@@ -1,4 +1,4 @@
-import { S, saveNow, save, getSession, deleteSession, makeEntry, historyFor, doneSets, fmtDate, fmtDateFull, fmtSec, num, uid, putFile, delFile, fileUrl } from '../store.js';
+import { S, saveNow, save, getSession, getWorkout, deleteSession, makeEntry, historyFor, doneSets, fmtDate, fmtDateFull, fmtSec, num, uid, putFile, delFile, fileUrl } from '../store.js';
 import { getEx } from '../exercises.js';
 import { esc, toast, keepAwake, unlockAudio } from '../ui.js';
 import { ICON, media, hydrateMedia, thumb, setsSummary, targetText, metricOf, chart, openPicker } from '../components.js';
@@ -81,10 +81,17 @@ export function exerciseView(root, id, idxStr) {
   const last = hist[0];
   const lastVideo = hist.find((h) => h.entry.video);
   const isTime = e.type === 'time';
-  if (isTime) {
-    useClock(`${s.id}:${e.id}`, e.seconds || 30);
-    clock.onDone = (secs) => logNextSet({ t: secs });
+  const timerOn = e.timer ?? isTime;
+  const restOn = () => e.restOn !== false && e.rest > 0;
+  if (timerOn) {
+    useClock(`${s.id}:${e.id}`, e.seconds || 45);
+    clock.onDone = (secs) => logNextSet(isTime ? { t: secs } : {});
   }
+  // Toggles changed during training are written back to the plan, so they stick next time.
+  const syncPlan = (patch) => {
+    const item = getWorkout(s.workoutId)?.exercises.find((x) => x.id === e.itemId);
+    if (item) Object.assign(item, patch);
+  };
 
   const setRows = () => e.sets.map((x, i) => `
     <div class="set-row ${x.done ? 'done' : ''}" data-i="${i}">
@@ -110,10 +117,14 @@ export function exerciseView(root, id, idxStr) {
 
     ${media(ex, 'lg')}
     <h1 class="ex-title">${esc(e.name)}</h1>
-    <p class="muted">Ziel: ${targetText(e)}${e.rest ? ` · Pause ${e.rest} s` : ''}</p>
+    <p class="muted">Ziel: ${targetText(e)}${restOn() ? ` · Pause ${e.rest} s` : ''}</p>
+    <div class="toggles card">
+      <label class="switch"><input type="checkbox" data-opt="timer" ${timerOn ? 'checked' : ''}><span></span>Timer</label>
+      <label class="switch"><input type="checkbox" data-opt="restOn" ${restOn() ? 'checked' : ''}><span></span>Pausentimer</label>
+    </div>
     ${ex.instructions.length ? `<details class="howto"><summary>Ausführung</summary><ol>${ex.instructions.map((t) => `<li>${esc(t)}</li>`).join('')}</ol></details>` : ''}
 
-    ${isTime ? `
+    ${timerOn ? `
     <section class="card clock" id="clock" data-key="${esc(clock.key)}">
       <div class="clock-ring">
         <svg viewBox="0 0 120 120"><circle class="clock-ring-bg" cx="60" cy="60" r="54"/><circle class="clock-ring-fg" cx="60" cy="60" r="54"/></svg>
@@ -182,7 +193,7 @@ export function exerciseView(root, id, idxStr) {
     const url = await fileUrl(slot.dataset.video);
     if (url) slot.innerHTML = `<video src="${url}" controls playsinline preload="metadata"></video>`;
   });
-  if (isTime) renderClock();
+  if (timerOn) renderClock();
 
   const rerender = () => { const y = window.scrollY; exerciseView(root, id, idxStr); window.scrollTo(0, y); };
 
@@ -193,7 +204,7 @@ export function exerciseView(root, id, idxStr) {
     Object.assign(target, values, { done: true });
     saveNow();
     if (location.hash === `#/session/${id}/${idx}`) rerender();
-    if (e.rest && e.sets.some((x) => !x.done)) startRest(e.rest);
+    if (restOn() && e.sets.some((x) => !x.done)) startRest(e.rest);
   }
 
   root.oninput = (ev) => {
@@ -210,6 +221,18 @@ export function exerciseView(root, id, idxStr) {
 
   root.onchange = async (ev) => {
     const t = ev.target;
+    if (t.dataset.opt) {
+      const key = t.dataset.opt;
+      e[key] = t.checked;
+      if (key === 'restOn' && t.checked && !e.rest) e.rest = 90;
+      if (key === 'restOn' && !t.checked) stopRest();
+      if (key === 'timer' && !t.checked && clock.key === `${s.id}:${e.id}`) pauseClock();
+      if (key === 'timer' && t.checked && !e.seconds) e.seconds = 45;
+      syncPlan({ [key]: e[key], rest: e.rest, seconds: e.seconds });
+      saveNow();
+      rerender();
+      return;
+    }
     if (t.hasAttribute('data-upload') && t.files[0]) {
       const f = t.files[0];
       if (f.size > 300 * 1024 * 1024) { toast('Video ist sehr groß (über 300 MB). Bitte kürzer filmen.'); return; }
@@ -251,7 +274,7 @@ export function exerciseView(root, id, idxStr) {
       const row = b.closest('.set-row');
       row.classList.toggle('done', x.done);
       b.setAttribute('aria-pressed', x.done);
-      if (x.done && e.rest && e.sets.some((y) => !y.done)) startRest(e.rest);
+      if (x.done && restOn() && e.sets.some((y) => !y.done)) startRest(e.rest);
       return;
     }
     switch (b.dataset.act) {
@@ -264,13 +287,18 @@ export function exerciseView(root, id, idxStr) {
         if (e.sets.length > 1) { e.sets.pop(); saveNow(); rerender(); }
         break;
       case 'clock-toggle': clock.running ? pauseClock() : startClock(); break;
-      case 'clock-minus': adjustClock(-5); break;
-      case 'clock-plus': adjustClock(5); break;
+      case 'clock-minus':
+      case 'clock-plus':
+        adjustClock(b.dataset.act === 'clock-plus' ? 5 : -5);
+        e.seconds = clock.total;
+        syncPlan({ seconds: e.seconds });
+        save();
+        break;
       case 'clock-reset': resetClock(); break;
       case 'clock-log': {
         const secs = clockElapsed();
         resetClock();
-        if (secs > 0) logNextSet({ t: secs });
+        if (secs > 0) logNextSet(isTime ? { t: secs } : {});
         break;
       }
       case 'video-del':
