@@ -1,4 +1,4 @@
-# Gym-App
+# Fitbyclin Fitness App
 
 Web-App fürs iPhone. Läuft ohne Server-Backend, alle Daten bleiben auf dem Gerät
 (Plan, Trainings, Notizen und Chat in `localStorage`, Videos in IndexedDB).

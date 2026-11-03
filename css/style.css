@@ -5,9 +5,10 @@
   --line: #2e2e34;
   --text: #f4f4f5;
   --muted: #a1a1aa;
-  --accent: #c8ff3d;
-  --accent-ink: #141a00;
-  --accent-soft: rgba(200, 255, 61, 0.14);
+  --accent: #e3242f;      /* fills: buttons, rings, dots */
+  --accent-ink: #ffffff;  /* text on red fills */
+  --accent-soft: rgba(227, 36, 47, 0.18);
+  --accent-text: #ff5a63; /* red text on dark background */
   --danger: #ff6b6b;
   --warn: #ffb547;
   --radius: 16px;
@@ -48,7 +49,9 @@ p { margin: 0; }
 /* ---------- headers ---------- */
 .page-head { display: flex; justify-content: space-between; align-items: flex-end; padding-top: 8px; }
 .page-head h1, .session-head h1 { font-size: 34px; font-weight: 850; letter-spacing: -0.02em; }
-.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
+.brand { font-size: 15px; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-text); margin-bottom: 10px; }
+.brand span { color: var(--muted); font-weight: 650; }
+.eyebrow { color: var(--accent-text); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
 .top-bar {
   position: sticky; top: 0; z-index: 5;
   margin: calc(-1 * var(--safe-t) - 12px) -16px 0;
@@ -66,7 +69,7 @@ p { margin: 0; }
 .muted { color: var(--muted); }
 .small { font-size: 14px; }
 .center { text-align: center; padding: 24px 8px; }
-.link { color: var(--accent); font-size: 14px; font-weight: 600; }
+.link { color: var(--accent-text); font-size: 14px; font-weight: 600; }
 .sub { font-size: 14px; color: var(--muted); margin-top: 6px; }
 
 .block { display: flex; flex-direction: column; gap: 8px; }
@@ -152,7 +155,7 @@ select.input { appearance: none; }
 .cal-cell.is-planned i { border: 2px solid var(--accent); }
 .cal-cell.is-missed i { border-color: var(--warn); }
 .cal-cell.is-done i { background: var(--accent); border: 0; }
-.cal-cell.is-today { color: var(--accent); }
+.cal-cell.is-today { color: var(--accent-text); }
 .cal-cell.is-sel { background: var(--surface-2); outline: 2px solid var(--accent); }
 .cal-legend { display: flex; gap: 14px; font-size: 13px; color: var(--muted); justify-content: center; }
 .cal-legend span { display: flex; align-items: center; gap: 5px; }
@@ -172,14 +175,14 @@ select.input { appearance: none; }
 
 /* ---------- exercise rows ---------- */
 .thumb { width: 52px; height: 52px; border-radius: 12px; object-fit: cover; background: #fff; flex: none; }
-.thumb-ph { display: grid; place-items: center; background: var(--surface-2); color: var(--accent); font-weight: 850; font-size: 16px; }
+.thumb-ph { display: grid; place-items: center; background: var(--surface-2); color: var(--accent-text); font-weight: 850; font-size: 16px; }
 .ex-list { display: grid; gap: 8px; }
 .ex-row { flex-direction: row; align-items: center; gap: 12px; padding: 10px; }
 .ex-main { flex: 1; display: grid; min-width: 0; }
 .ex-main b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ex-count { min-width: 44px; height: 32px; border-radius: 10px; background: var(--surface-2); display: grid; place-items: center; font-weight: 750; font-size: 14px; }
 .ex-count.ok { background: var(--accent); color: var(--accent-ink); }
-.ex-row.complete { border-color: rgba(200, 255, 61, 0.35); }
+.ex-row.complete { border-color: rgba(255, 90, 99, 0.45); }
 
 /* ---------- media ---------- */
 .media { position: relative; width: 100%; flex: none; border-radius: var(--radius); overflow: hidden; background: #fff; aspect-ratio: 4 / 3; }
@@ -190,7 +193,7 @@ select.input { appearance: none; }
 @keyframes swap { 0%, 40% { opacity: 0; } 50%, 90% { opacity: 1; } 100% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .media.anim img:nth-child(2) { animation: none; opacity: 0; } }
 .media.ph, .media-ph { background: var(--surface); border: 1px dashed var(--line); display: grid; place-items: center; align-content: center; gap: 8px; color: var(--muted); text-align: center; padding: 20px; font-size: 14px; }
-.media.ph svg, .media-ph svg { width: 48px; height: 48px; color: var(--accent); }
+.media.ph svg, .media-ph svg { width: 48px; height: 48px; color: var(--accent-text); }
 .media-ph { position: absolute; inset: 0; }
 .howto { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; }
 .howto summary { font-weight: 700; cursor: pointer; }
@@ -204,8 +207,8 @@ select.input { appearance: none; }
 .set-row .input { text-align: center; font-weight: 700; font-size: 18px; }
 .check { width: 52px; height: 46px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line); display: grid; place-items: center; color: var(--muted); }
 .set-row.done .check { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
-.set-row.done .set-n { background: var(--accent-soft); color: var(--accent); }
-.set-row.done .input { border-color: rgba(200, 255, 61, 0.35); }
+.set-row.done .set-n { background: var(--accent-soft); color: var(--accent-text); }
+.set-row.done .input { border-color: rgba(255, 90, 99, 0.45); }
 .stepper { display: flex; align-items: center; gap: 10px; font-weight: 800; }
 .last-time { font-size: 14px; color: var(--muted); background: var(--surface); border-radius: 12px; padding: 10px 12px; }
 .last-time b { color: var(--text); }
@@ -221,7 +224,7 @@ select.input { appearance: none; }
 .clock-time { font-size: 54px; font-weight: 850; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
 .clock-total { color: var(--muted); font-size: 14px; }
 .clock-btns { display: flex; gap: 10px; justify-content: center; width: 100%; }
-.clock.running .clock-time { color: var(--accent); }
+.clock.running .clock-time { color: var(--accent-text); }
 
 /* ---------- videos & history ---------- */
 .video-slot:empty { display: none; }
@@ -262,7 +265,7 @@ select.input { appearance: none; }
   border-top: 1px solid var(--line);
 }
 #tabbar a { display: grid; place-items: center; align-content: center; gap: 3px; color: var(--muted); font-size: 11px; font-weight: 650; }
-#tabbar a.active { color: var(--accent); }
+#tabbar a.active { color: var(--accent-text); }
 #rest-bar {
   position: fixed; left: 12px; right: 12px; z-index: 11; overflow: hidden;
   bottom: calc(var(--tabbar-h) + var(--safe-b) + 10px);

@@ -42,7 +42,7 @@ export async function settings(root) {
 
   root.onclick = (e) => {
     if (e.target.closest('[data-export]')) {
-      download(`gym-sicherung-${today()}.json`, new Blob([JSON.stringify(S(), null, 1)], { type: 'application/json' }));
+      download(`fitbyclin-sicherung-${today()}.json`, new Blob([JSON.stringify(S(), null, 1)], { type: 'application/json' }));
     }
     if (e.target.closest('[data-reset]')) {
       if (!confirm('Wirklich alles löschen? Plan, Trainings, Notizen und Chat sind danach weg.')) return;

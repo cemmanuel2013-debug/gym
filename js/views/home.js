@@ -40,7 +40,7 @@ export function home(root) {
 
   root.innerHTML = `
     <header class="page-head">
-      <div><p class="eyebrow">${esc(fmtDateFull(t))}</p><h1>Heute</h1></div>
+      <div><p class="brand">Fitbyclin <span>Fitness App</span></p><p class="eyebrow">${esc(fmtDateFull(t))}</p><h1>Heute</h1></div>
       <a class="icon-btn" href="#/settings" aria-label="Einstellungen">${ICON.gear}</a>
     </header>
     ${plannedCards}${rest}${extraCards}
