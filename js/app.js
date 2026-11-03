@@ -9,6 +9,7 @@ import { sessionView, exerciseView } from './views/session.js';
 import { historyView, exerciseHistory } from './views/history.js';
 import { chat } from './views/chat.js';
 import { settings } from './views/settings.js';
+import { stepsView } from './views/steps.js';
 
 const routes = [
   [/^\/?$/, home, 'home'],
@@ -21,6 +22,7 @@ const routes = [
   [/^\/history\/ex\/(.+)$/, exerciseHistory, 'history'],
   [/^\/chat$/, chat, 'chat'],
   [/^\/settings$/, settings, 'home'],
+  [/^\/steps$/, stepsView, 'home'],
 ];
 
 function render() {

@@ -1,6 +1,7 @@
 import { S, today, fmtDate, fmtDateFull, workoutsOn, nextPlanned, sessionsOn, sessionsSorted, sessionHasWork, startSession, openSessionFor, doneSets } from '../store.js';
 import { esc, openSheet } from '../ui.js';
 import { ICON, weekStrip, targetText } from '../components.js';
+import { stepsCard, importSteps } from './steps.js';
 
 export function home(root) {
   const t = today();
@@ -44,6 +45,7 @@ export function home(root) {
       <a class="icon-btn" href="#/settings" aria-label="Einstellungen">${ICON.gear}</a>
     </header>
     ${plannedCards}${rest}${extraCards}
+    ${stepsCard()}
     <section class="block">
       <div class="block-head"><h3 class="label">Diese Woche</h3><a class="link" href="#/plan">Plan ändern</a></div>
       ${weekStrip()}
@@ -59,6 +61,7 @@ export function home(root) {
     const start = e.target.closest('[data-start]');
     if (start) { const s = startSession(start.dataset.start, t); location.hash = `#/session/${s.id}`; return; }
     if (e.target.closest('[data-pick-workout]')) pickWorkout(t);
+    if (e.target.closest('[data-steps-import]')) importSteps(() => home(root));
   };
 }
 

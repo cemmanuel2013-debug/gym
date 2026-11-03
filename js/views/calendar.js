@@ -2,6 +2,7 @@ import { today, ymd, parseYmd, fmtDateFull, workoutsOn, sessionsOn, sessionDone,
 import { esc } from '../ui.js';
 import { ICON } from '../components.js';
 import { pickWorkout } from './home.js';
+import { stepsOf, fmtSteps } from './steps.js';
 
 let month = null; // first day of the shown month
 let selected = null;
@@ -54,6 +55,7 @@ export function calendar(root, query) {
     </section>
     <section class="block">
       <h3 class="label">${esc(fmtDateFull(selected))}</h3>
+      ${stepsOf(selected) != null ? `<a class="card row-link" href="#/steps"><span><b>${fmtSteps(stepsOf(selected))} Schritte</b><small>aus Apple Health</small></span>${ICON.next}</a>` : ''}
       ${plannedRows}${extraRows}
       ${!plannedRows && !extraRows ? '<p class="muted">An diesem Tag ist kein Training geplant.</p>' : ''}
       ${selected <= t ? '<button class="btn ghost full" data-other>Anderes Training eintragen</button>' : ''}

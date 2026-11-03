@@ -1,6 +1,6 @@
 // Offline support: app files are served from cache and refreshed in the background,
 // exercise images from the CDN are cached the first time they load.
-const VERSION = 'gym-v3';
+const VERSION = 'gym-v4';
 const IMG_CACHE = 'gym-img-v1';
 const SHELL = [
   './',
@@ -20,6 +20,7 @@ const SHELL = [
   'js/views/history.js',
   'js/views/chat.js',
   'js/views/settings.js',
+  'js/views/steps.js',
   'data/exercises.json',
   'icons/icon-180.png',
   'icons/icon-192.png',
@@ -27,7 +28,12 @@ const SHELL = [
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  // cache: 'reload' skips the browser's HTTP cache, so a new version never stores old files.
+  e.waitUntil(
+    caches.open(VERSION)
+      .then((c) => c.addAll(SHELL.map((u) => new Request(u, { cache: 'reload' }))))
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', (e) => {
@@ -61,7 +67,7 @@ self.addEventListener('fetch', (e) => {
   e.respondWith(
     caches.open(VERSION).then(async (c) => {
       const hit = await c.match(req, { ignoreSearch: true });
-      const net = fetch(req)
+      const net = fetch(req, { cache: 'no-cache' })
         .then((res) => { if (res.ok) c.put(req, res.clone()); return res; })
         .catch(() => hit);
       return hit || net;

@@ -134,6 +134,22 @@ select.input { appearance: none; }
 .switch input:checked + span::after { transform: translateX(18px); background: var(--accent-ink); }
 .switch input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
 
+/* ---------- steps ---------- */
+.steps-big { display: flex; align-items: baseline; gap: 8px; }
+.steps-big b { font-size: 34px; font-weight: 850; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.progress { height: 8px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+.progress i { display: block; height: 100%; background: var(--accent); border-radius: inherit; }
+.bars { position: relative; display: flex; gap: 6px; align-items: flex-end; padding-top: 6px; }
+.bars.dense { gap: 2px; }
+.bar { flex: 1; display: grid; gap: 4px; justify-items: center; min-width: 0; }
+.bar-track { width: 100%; height: 90px; display: flex; align-items: flex-end; background: var(--surface-2); border-radius: 6px; overflow: hidden; }
+.bar-track i { display: block; width: 100%; background: #6b6b74; border-radius: 6px 6px 0 0; }
+.bar.hit .bar-track i { background: var(--accent); }
+.bar.today span { color: var(--accent-text); font-weight: 800; }
+.bar span { font-size: 11px; color: var(--muted); height: 14px; line-height: 14px; }
+.bar-goal { position: absolute; left: 0; right: 0; bottom: calc(18px + var(--g) * 90px); border-top: 1px dashed var(--accent-text); pointer-events: none; }
+.hist-btn { width: 100%; text-align: left; }
+
 /* ---------- week strip ---------- */
 .week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
 .wk-day { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 8px 2px; display: grid; justify-items: center; gap: 2px; min-width: 0; }
