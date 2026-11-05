@@ -1,4 +1,5 @@
 import { S } from './store.js';
+import { PEX } from './programs.js';
 
 // Images come from free-exercise-db (The Unlicense), pinned to one commit so they never change.
 const IMG_BASE = 'https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/';
@@ -81,14 +82,24 @@ export async function loadExercises() {
 
 const defaultType = (e) => (e.c === 'stretching' || /plank|hold|hang/i.test(e.n) ? 'time' : 'reps');
 
-/** Unified view of any exercise: database, built-in or own. */
+export const imgUrl = (dbId, i = 0) => { const r = byId.get(dbId); return r?.img[i] ? IMG_BASE + r.img[i] : null; };
+
+/** Unified view of any exercise: database, built-in, program or own. */
 export function getEx(id) {
   const st = S();
   const custom = st.customExercises.find((c) => c.id === id);
   const builtin = BUILTIN.find((b) => b.id === id);
   const raw = byId.get(id);
+  const prog = PEX[id];
   let ex;
-  if (custom) ex = { id, name: custom.name, type: custom.type, muscles: [], equipment: '', instructions: custom.instructions || [], images: [], kind: 'custom' };
+  if (prog) {
+    const base = prog.same ? getEx(prog.same) : null;
+    const anim = prog.anim ? byId.get(prog.anim) : null;
+    ex = {
+      id, name: prog.n, type: base?.type || 'reps', muscles: anim?.m || base?.muscles || [], equipment: anim?.eq || base?.equipment || '',
+      instructions: prog.i || base?.instructions || [], images: anim ? anim.img.map((p) => IMG_BASE + p) : [], kind: 'program',
+    };
+  } else if (custom) ex = { id, name: custom.name, type: custom.type, muscles: [], equipment: '', instructions: custom.instructions || [], images: [], kind: 'custom' };
   else if (builtin) ex = { id, name: builtin.n, type: builtin.type, muscles: builtin.m, equipment: builtin.eq, instructions: builtin.i, images: [], kind: 'builtin' };
   else if (raw) ex = { id, name: raw.n, type: defaultType(raw), muscles: raw.m, equipment: raw.eq, instructions: raw.i, images: raw.img.map((p) => IMG_BASE + p), kind: 'db' };
   else ex = { id, name: id, type: 'reps', muscles: [], equipment: '', instructions: [], images: [], kind: 'missing' };
@@ -107,6 +118,7 @@ export function searchEx(query, muscle, equip) {
   const own = [
     ...S().customExercises.map((c) => ({ id: c.id, n: c.name, m: [], eq: '' })),
     ...BUILTIN,
+    ...Object.entries(PEX).filter(([, p]) => !p.same).map(([pid, p]) => ({ id: pid, n: p.n, m: byId.get(p.anim)?.m || [], eq: byId.get(p.anim)?.eq || '' })),
   ].filter((e) => (!muscle && !equip ? tokens.every((t) => e.n.toLowerCase().includes(t)) : match(e.n, e.m, e.eq)));
   const fromDb = db.filter((e) => match(e.n, e.m, e.eq));
   return { own: own.map((e) => e.id), db: fromDb.map((e) => e.id) };

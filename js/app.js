@@ -2,7 +2,9 @@ import { load } from './store.js';
 import { loadExercises } from './exercises.js';
 import { toast, unlockAudio, keepAwake } from './ui.js';
 import { initRestBar } from './timers.js';
-import { home } from './views/home.js';
+import { train } from './views/train.js';
+import { programView } from './views/program.js';
+import { profile } from './views/profile.js';
 import { calendar } from './views/calendar.js';
 import { planList, planEdit } from './views/plan.js';
 import { sessionView, exerciseView } from './views/session.js';
@@ -12,17 +14,19 @@ import { settings } from './views/settings.js';
 import { stepsView } from './views/steps.js';
 
 const routes = [
-  [/^\/?$/, home, 'home'],
+  [/^\/?$/, train, 'train'],
+  [/^\/program\/([\w-]+)$/, programView, 'train'],
   [/^\/calendar$/, calendar, 'calendar', true],
-  [/^\/plan$/, planList, 'plan'],
-  [/^\/plan\/([\w-]+)$/, planEdit, 'plan'],
-  [/^\/session\/([\w-]+)$/, sessionView, 'home'],
-  [/^\/session\/([\w-]+)\/(\d+)$/, exerciseView, 'home'],
+  [/^\/plan$/, planList, 'train'],
+  [/^\/plan\/([\w-]+)$/, planEdit, 'train'],
+  [/^\/session\/([\w-]+)$/, sessionView, 'train'],
+  [/^\/session\/([\w-]+)\/(\d+)$/, exerciseView, 'train'],
   [/^\/history$/, historyView, 'history'],
   [/^\/history\/ex\/(.+)$/, exerciseHistory, 'history'],
   [/^\/chat$/, chat, 'chat'],
-  [/^\/settings$/, settings, 'home'],
-  [/^\/steps$/, stepsView, 'home'],
+  [/^\/profile$/, profile, 'profile'],
+  [/^\/settings$/, settings, 'profile'],
+  [/^\/steps$/, stepsView, 'profile'],
 ];
 
 function render() {

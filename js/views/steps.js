@@ -113,7 +113,7 @@ export function stepsView(root) {
 
   root.innerHTML = `
     <header class="top-bar">
-      <a class="icon-btn" href="#/" aria-label="Zurück">${ICON.back}</a>
+      <a class="icon-btn" href="#/profile" aria-label="Zurück">${ICON.back}</a>
       <b>Schritte</b>
       <span class="icon-btn" aria-hidden="true"></span>
     </header>

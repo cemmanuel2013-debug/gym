@@ -6,12 +6,16 @@ import { ICON, weekStrip, targetText, thumb, openPicker } from '../components.js
 export function planList(root) {
   const ws = S().workouts;
   root.innerHTML = `
-    <header class="page-head"><div><p class="eyebrow">Trainingsplan</p><h1>Plan</h1></div></header>
+    <header class="top-bar">
+      <a class="icon-btn" href="#/" aria-label="Zurück">${ICON.back}</a>
+      <b>Meine Workouts</b>
+      <span class="icon-btn" aria-hidden="true"></span>
+    </header>
     <section class="block"><h3 class="label">Deine Woche</h3>${weekStrip()}</section>
     <section class="block">
       <h3 class="label">Workouts</h3>
       ${ws.map((w) => `<a class="card row-link" href="#/plan/${w.id}">
-        <span><b>${esc(w.name)}</b><small>${w.days.length ? WEEK_ORDER.filter((d) => w.days.includes(d)).map((d) => DAY_SHORT[d]).join(' · ') : 'kein fester Tag'} · ${w.exercises.length} Übungen</small></span>${ICON.next}
+        <span><b>${esc(w.name)}</b><small>${w.days.length ? WEEK_ORDER.filter((d) => w.days.includes(d)).map((d) => DAY_SHORT[d]).join(' · ') : 'kein fester Tag'}${w.cycle ? ` · alle ${w.cycle.len} Wochen` : ''} · ${w.exercises.length} Übungen</small></span>${ICON.next}
       </a>`).join('') || '<p class="muted">Noch keine Workouts.</p>'}
       <button class="btn primary full" data-new>${ICON.plus} Neues Workout</button>
     </section>`;
@@ -104,7 +108,7 @@ function editItem(w, i, rerender) {
      </div>
      <div class="grid2">
        <label class="field"><span>Sätze</span><input class="input" name="sets" inputmode="numeric" value="${it.sets}"></label>
-       <label class="field" data-show="reps"><span>Wiederholungen</span><input class="input" name="reps" value="${esc(it.reps)}" placeholder="z. B. 8-12"></label>
+       <label class="field" data-show="reps"><span>Wiederholungen</span><input class="input" name="reps" value="${esc(it.repsText ?? it.reps)}" placeholder="z. B. 8-12"></label>
        <label class="field" data-show="time"><span>Sekunden (Timer)</span><input class="input" name="seconds" inputmode="numeric" value="${it.seconds || ''}" placeholder="45"></label>
        <label class="field" data-show="rest"><span>Pause (Sek.)</span><input class="input" name="rest" inputmode="numeric" value="${it.rest || 90}"></label>
      </div>
@@ -135,7 +139,8 @@ function editItem(w, i, rerender) {
         it.name = v('name') || getEx(it.exId).name;
         it.type = sheet.querySelector('[name="type"]:checked').value;
         it.sets = Math.max(1, Math.min(20, parseInt(v('sets'), 10) || 3));
-        it.reps = v('reps');
+        if (v('reps') !== (it.repsText ?? it.reps)) { it.reps = v('reps'); it.repsText = undefined; }
+        if (it.type === 'time') it.repsText = undefined;
         it.timer = timerBox.checked;
         it.restOn = restBox.checked;
         it.seconds = Math.max(0, parseInt(v('seconds'), 10) || 0) || (it.type === 'time' || it.timer ? 45 : 0);

@@ -59,6 +59,7 @@ export function load() {
   if (!state || state.version !== 1) { state = sampleState(); saveNow(); }
   state.demos ||= {};
   state.customExercises ||= [];
+  state.favorites ||= ['soccer', 'daily-mobility', 'mobility-express'];
   return state;
 }
 export const S = () => state;
@@ -75,7 +76,16 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) saveN
 
 // ---------- workouts ----------
 export const getWorkout = (id) => state.workouts.find((w) => w.id === id);
-export const workoutsOn = (dateStr) => { const wd = parseYmd(dateStr).getDay(); return state.workouts.filter((w) => w.days.includes(wd)); };
+/** Alternating weeks (A/B): cycle = { start: Monday 'YYYY-MM-DD', len: 2, idx: 0 | 1 }. */
+function inCycle(w, dateStr) {
+  if (!w.cycle) return true;
+  const weeks = Math.round((mondayOf(parseYmd(dateStr)) - parseYmd(w.cycle.start)) / (7 * 864e5));
+  return ((weeks % w.cycle.len) + w.cycle.len) % w.cycle.len === w.cycle.idx;
+}
+export const workoutsOn = (dateStr) => {
+  const wd = parseYmd(dateStr).getDay();
+  return state.workouts.filter((w) => w.days.includes(wd) && inCycle(w, dateStr));
+};
 export function nextPlanned(fromStr) {
   for (let i = 1; i <= 14; i++) {
     const d = ymd(addDays(parseYmd(fromStr), i));
@@ -121,8 +131,8 @@ export function makeEntry(item) {
   }
   return {
     id: uid(), itemId: item.id, exId: item.exId, name: item.name, type: item.type,
-    reps: item.reps, seconds: item.seconds, rest: item.rest, targetSets: n,
-    timer: item.timer ?? item.type === 'time', restOn: item.restOn !== false,
+    reps: item.reps, repsText: item.repsText, seconds: item.seconds, rest: item.rest, targetSets: n,
+    timer: item.timer ?? item.type === 'time', restOn: item.restOn !== false, ss: !!item.ss,
     sets, note: '', video: null,
   };
 }
@@ -133,6 +143,14 @@ export function startSession(workoutId, dateStr) {
     id: uid(), date: dateStr, workoutId: w?.id ?? null, name: w?.name ?? 'Freies Training',
     startedAt: Date.now(), finishedAt: null, entries: w ? w.exercises.map(makeEntry) : [],
   };
+  state.sessions.push(s);
+  saveNow();
+  return s;
+}
+
+/** Session straight from a program day (not necessarily in the plan). */
+export function startSessionFromItems(name, items, dateStr, workoutId = null) {
+  const s = { id: uid(), date: dateStr, workoutId, name, startedAt: Date.now(), finishedAt: null, entries: items.map(makeEntry) };
   state.sessions.push(s);
   saveNow();
   return s;

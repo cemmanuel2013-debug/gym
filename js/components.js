@@ -15,12 +15,23 @@ export const ICON = {
   person: '<svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><path d="M12 7v7M8 10h8M12 14l-3 6M12 14l3 6"/></svg>',
   close: '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>',
   send: '<svg viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-3-6z"/></svg>',
+  search: '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>',
+  cal: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+  calPlus: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M12 13v5M9.5 15.5h5"/></svg>',
+  list: '<svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>',
+  play: '<svg viewBox="0 0 24 24"><path d="M7 5l12 7-12 7z"/></svg>',
+  heart: '<svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>',
+  chevDown: '<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>',
+  steps: '<svg viewBox="0 0 24 24"><path d="M8 3c2 0 3 2 3 5s-1 5-3 5-3-2-3-5 1-5 3-5zM6 15h4v2a2 2 0 0 1-4 0zM16 7c2 0 3 2 3 5s-1 5-3 5-3-2-3-5 1-5 3-5zM14 19h4v1a2 2 0 0 1-4 0z"/></svg>',
+  box: '<svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4zM3 7l9 4 9-4M12 11v10"/></svg>',
 };
 
 /** Works for plan items (sets is a number) and session entries (sets is an array). */
 export const targetText = (it) => {
   const n = Array.isArray(it.sets) ? it.targetSets : it.sets;
-  return it.type === 'time' ? `${n} × ${fmtSec(it.seconds || 0)}` : `${n} × ${it.reps || '?'} Wdh.`;
+  if (it.type === 'time') return `${n} × ${it.repsText || fmtSec(it.seconds || 0)}`;
+  const r = it.repsText || it.reps || '?';
+  return `${n} × ${/[A-Za-zäöüÄÖÜ]/.test(r) ? r : `${r} Wdh.`}`;
 };
 
 /** Two database pictures cross-faded into a short loop, or the user's own demo video. */

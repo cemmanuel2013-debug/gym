@@ -27,9 +27,9 @@ export function sessionView(root, id) {
         const ex = getEx(e.exId);
         const d = doneSets(e).length;
         const complete = d >= e.sets.length && d > 0;
-        return `<a class="card ex-row ${complete ? 'complete' : ''}" href="#/session/${s.id}/${i}">
+        return `<a class="card ex-row ${complete ? 'complete' : ''} ${e.ss && i < s.entries.length - 1 ? 'ss' : ''}" href="#/session/${s.id}/${i}">
           ${thumb(ex)}
-          <span class="ex-main"><b>${esc(e.name)}</b><small>${targetText(e)}${e.video ? ' · Video' : ''}${e.note ? ' · Notiz' : ''}</small></span>
+          <span class="ex-main"><b>${esc(e.name)}</b><small>${esc(targetText(e))}${e.video ? ' · Video' : ''}${e.note ? ' · Notiz' : ''}</small></span>
           <span class="ex-count ${complete ? 'ok' : ''}">${complete ? ICON.check : `${d}/${e.sets.length}`}</span>
         </a>`;
       }).join('') || '<p class="muted">Noch keine Übungen in diesem Training.</p>'}
@@ -117,7 +117,9 @@ export function exerciseView(root, id, idxStr) {
 
     ${media(ex, 'lg')}
     <h1 class="ex-title">${esc(e.name)}</h1>
-    <p class="muted">Ziel: ${targetText(e)}${restOn() ? ` · Pause ${e.rest} s` : ''}</p>
+    <p class="muted">Ziel: ${esc(targetText(e))}${restOn() ? ` · Pause ${e.rest} s` : ''}</p>
+    ${e.ss && s.entries[idx + 1] ? `<p class="ss-note">Supersatz mit <b>${esc(s.entries[idx + 1].name)}</b>: nach jedem Satz direkt dorthin, Pause erst danach.</p>` : ''}
+    ${idx > 0 && s.entries[idx - 1].ss ? `<p class="ss-note">Supersatz mit <b>${esc(s.entries[idx - 1].name)}</b>: nach diesem Satz Pause, dann zurück.</p>` : ''}
     <div class="toggles card">
       <label class="switch"><input type="checkbox" data-opt="timer" ${timerOn ? 'checked' : ''}><span></span>Timer</label>
       <label class="switch"><input type="checkbox" data-opt="restOn" ${restOn() ? 'checked' : ''}><span></span>Pausentimer</label>
