@@ -2,6 +2,7 @@ import { S, uid, saveNow, getWorkout, DAY_SHORT, WEEK_ORDER } from '../store.js'
 import { getEx } from '../exercises.js';
 import { esc, openSheet, toast } from '../ui.js';
 import { ICON, weekStrip, targetText, thumb, openPicker } from '../components.js';
+import { openSharePlan, openImportPlan } from './share.js';
 
 export function planList(root) {
   const ws = S().workouts;
@@ -18,8 +19,17 @@ export function planList(root) {
         <span><b>${esc(w.name)}</b><small>${w.days.length ? WEEK_ORDER.filter((d) => w.days.includes(d)).map((d) => DAY_SHORT[d]).join(' · ') : 'kein fester Tag'}${w.cycle ? ` · alle ${w.cycle.len} Wochen` : ''} · ${w.exercises.length} Übungen</small></span>${ICON.next}
       </a>`).join('') || '<p class="muted">Noch keine Workouts.</p>'}
       <button class="btn primary full" data-new>${ICON.plus} Neues Workout</button>
+    </section>
+    <section class="block">
+      <h3 class="label">Mit Freunden</h3>
+      <div class="grid2">
+        <button class="btn ghost" data-share>${ICON.send} Plan teilen</button>
+        <button class="btn ghost" data-import>Plan importieren</button>
+      </div>
     </section>`;
   root.onclick = (e) => {
+    if (e.target.closest('[data-share]')) { openSharePlan(); return; }
+    if (e.target.closest('[data-import]')) { openImportPlan(() => planList(root)); return; }
     if (!e.target.closest('[data-new]')) return;
     const w = { id: uid(), name: 'Neues Workout', days: [], exercises: [] };
     S().workouts.push(w);
