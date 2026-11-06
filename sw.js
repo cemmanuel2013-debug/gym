@@ -1,6 +1,6 @@
 // Offline support: app files are served from cache and refreshed in the background,
 // exercise images from the CDN are cached the first time they load.
-const VERSION = 'gym-v6';
+const VERSION = 'gym-v7';
 const IMG_CACHE = 'gym-img-v1';
 const SHELL = [
   './',
@@ -25,6 +25,7 @@ const SHELL = [
   'js/views/program.js',
   'js/views/profile.js',
   'js/views/share.js',
+  'js/views/autoplay.js',
   'js/programs.js',
   'data/exercises.json',
   'icons/icon-180.png',

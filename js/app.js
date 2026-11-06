@@ -12,6 +12,7 @@ import { historyView, exerciseHistory } from './views/history.js';
 import { chat } from './views/chat.js';
 import { settings } from './views/settings.js';
 import { stepsView } from './views/steps.js';
+import { autoplayView } from './views/autoplay.js';
 
 const routes = [
   [/^\/?$/, train, 'train'],
@@ -21,6 +22,7 @@ const routes = [
   [/^\/plan\/([\w-]+)$/, planEdit, 'train'],
   [/^\/session\/([\w-]+)$/, sessionView, 'train'],
   [/^\/session\/([\w-]+)\/(\d+)$/, exerciseView, 'train'],
+  [/^\/autoplay\/([\w-]+)$/, autoplayView, 'train'],
   [/^\/history$/, historyView, 'history'],
   [/^\/history\/ex\/(.+)$/, exerciseHistory, 'history'],
   [/^\/chat$/, chat, 'chat'],
@@ -38,7 +40,7 @@ function render() {
     const m = path.match(re);
     if (!m) continue;
     root.onclick = root.oninput = root.onchange = null;
-    if (!path.startsWith('/session')) keepAwake(false);
+    if (!path.startsWith('/session') && !path.startsWith('/autoplay')) keepAwake(false);
     const args = m.slice(1).map(decodeURIComponent);
     fn(root, ...(wantsQuery ? [query] : args));
     document.querySelectorAll('#tabbar a').forEach((a) => a.classList.toggle('active', a.dataset.tab === tab));

@@ -22,6 +22,8 @@ export function sessionView(root, id) {
       <h1>${esc(s.name)}</h1>
       <p class="muted">${total} Sätze erledigt${s.finishedAt ? ' · abgeschlossen' : ''}</p>
     </section>
+    ${s.entries.length ? `<a class="btn primary full big ap-start" href="#/autoplay/${s.id}">${ICON.play} Autoplay starten</a>
+    <p class="muted small">Die App führt dich mit Ansage durch alle offenen Sätze, zählt Zeiten herunter und trägt die Sätze ein.</p>` : ''}
     <div class="ex-list">
       ${s.entries.map((e, i) => {
         const ex = getEx(e.exId);

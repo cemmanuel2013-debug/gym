@@ -229,6 +229,37 @@ select.input { appearance: none; }
 .ex-row { position: relative; }
 .ex-row.ss::after { content: ''; position: absolute; left: 35px; bottom: -10px; width: 3px; height: 12px; background: var(--accent); border-radius: 2px; }
 
+/* ---------- autoplay ---------- */
+.ap-start svg { width: 20px; height: 20px; fill: currentColor; }
+.ap-progress { height: 4px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+.ap-progress i { display: block; height: 100%; background: var(--accent); transition: width 0.3s; }
+.ap-phase { align-self: center; font-size: 13px; font-weight: 850; text-transform: uppercase; letter-spacing: 0.1em; padding: 6px 14px; border-radius: 99px; background: var(--surface-2); color: var(--muted); }
+.ap-phase.ap-work, .ap-phase.ap-reps { background: var(--accent); color: var(--accent-ink); }
+.ap-phase.ap-switch, .ap-phase.ap-prep { background: var(--accent-soft); color: var(--accent-text); }
+.ap-name { font-size: 28px; line-height: 1.1; font-weight: 900; text-align: center; letter-spacing: -0.01em; }
+body[data-route="autoplay"] #view { gap: 10px; }
+.ap-sub { text-align: center; margin-top: -8px; }
+.ap-clock { display: grid; place-items: center; }
+.ap-clock .clock-ring { width: min(220px, 30dvh); height: min(220px, 30dvh); }
+.ap-clock .clock-time { font-size: 58px; }
+.media.ap { aspect-ratio: auto; height: min(200px, 24dvh); }
+.ap-clock[data-kind="rest"] .clock-ring-fg, .ap-clock[data-kind="prep"] .clock-ring-fg, .ap-clock[data-kind="switch"] .clock-ring-fg { stroke: #6b6b74; }
+.ap-reps { align-items: center; text-align: center; gap: 10px; padding: 22px 16px; }
+.ap-reps b { font-size: 30px; font-weight: 900; }
+.ap-controls { display: flex; justify-content: center; align-items: center; gap: 22px; }
+.big-round { width: 58px; height: 58px; border-radius: 50%; background: var(--surface-2); border: 1px solid var(--line); }
+.big-round.main { width: 78px; height: 78px; background: var(--accent); color: var(--accent-ink); border: 0; }
+.big-round.main svg { width: 30px; height: 30px; fill: currentColor; }
+.ap-next { text-align: center; color: var(--muted); }
+.ap-next b { color: var(--text); }
+.ap-done { align-items: center; text-align: center; padding: 28px 16px; gap: 12px; }
+.ap-done h1 { font-size: 32px; font-weight: 900; }
+.ap-big-check { width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--accent-ink); }
+.ap-big-check svg { width: 36px; height: 36px; stroke-width: 3; }
+.icon-btn.on-accent { color: var(--accent-text); }
+.media.md + .ap-name { margin-top: 4px; }
+body[data-route="autoplay"] #rest-bar { display: none !important; }
+
 /* ---------- share plan ---------- */
 .share-list { display: grid; gap: 6px; max-height: 40dvh; overflow-y: auto; }
 .check-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; background: var(--surface-2); cursor: pointer; }
